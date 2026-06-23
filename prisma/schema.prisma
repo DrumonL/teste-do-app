@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Participant {
+  id             String   @id
+  location       String
+  deviceType     String?
+  gender         String?
+  ageGroup       String?
+  educationLevel String?
+  incomeGroup    String?
+  createdAt      DateTime @default(now())
+
+  sessions     Session[]
+  choices      Choice[]
+  sealReadings SealReading[]
+  revisions    Revision[]
+}
+
+model Session {
+  id                String    @id @default(uuid())
+  participantId     String
+  sessionNumber     Int
+  randomizationSeed String
+  startedAt         DateTime  @default(now())
+  completedAt       DateTime?
+
+  participant Participant @relation(fields: [participantId], references: [id])
+  choices     Choice[]
+}
+
+model Choice {
+  id                   String   @id @default(uuid())
+  participantId        String
+  sessionId            String?
+  sessionNumber        Int
+
+  optionId             String
+  cutId                String?
+  sealId               String?
+  price                Float?
+
+  displayedPosition    Int
+  selectedRank         Int?
+  confirmed            Boolean  @default(false)
+  selectionTimeSeconds Int?
+  createdAt            DateTime @default(now())
+
+  participant Participant @relation(fields: [participantId], references: [id])
+  session     Session?    @relation(fields: [sessionId], references: [id])
+}
+
+model SealReading {
+  id                 String   @id @default(uuid())
+  participantId      String
+  sealId             String
+  openedDescription  Boolean  @default(false)
+  readingTimeSeconds Int?
+  agreedDescription  Boolean?
+  createdAt          DateTime @default(now())
+
+  participant Participant @relation(fields: [participantId], references: [id])
+}
+
+model Revision {
+  id            String   @id @default(uuid())
+  participantId String
+  sessionNumber Int
+  action        String
+  optionId      String?
+  createdAt     DateTime @default(now())
+
+  participant Participant @relation(fields: [participantId], references: [id])
+}
+
+model ProductOption {
+  id       String  @id
+  cutId    String
+  sealId   String
+  imageUrl String?
+  location String?
+  active   Boolean @default(true)
+}
+
+model Seal {
+  id          String  @id
+  name        String
+  color       String
+  description String
+  active      Boolean @default(true)
+}
+
+model Cut {
+  id       String  @id
+  name     String
+  format   String
+  imageUrl String?
+  active   Boolean @default(true)
+}
