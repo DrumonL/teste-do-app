@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import * as XLSX from "xlsx";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { writeCsvAndSqliteExports } from "@/lib/dataExports";
 
 export const runtime = "nodejs";
 
@@ -50,10 +52,14 @@ export async function POST(request: NextRequest) {
 
     await ensureDataDir();
 
+    const dataDir = path.join(process.cwd(), "data");
     const filePath = path.join(
-      process.cwd(),
-      "data",
+      dataDir,
       "click-logs-results.json"
+    );
+    const excelPath = path.join(
+      dataDir,
+      "click-logs-results.xlsx"
     );
 
     const existing = await readExistingClickLogs(filePath);
@@ -77,10 +83,47 @@ export async function POST(request: NextRequest) {
       JSON.stringify(nextFile, null, 2)
     );
 
+    const exportWarnings: string[] = [];
+
+    try {
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(
+        nextFile.clickRows.length
+          ? nextFile.clickRows
+          : [{ note: "No click logs recorded" }]
+      );
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Click Logs");
+
+      const excelBuffer = XLSX.write(workbook, {
+        type: "buffer",
+        bookType: "xlsx",
+      });
+
+      await fs.writeFile(excelPath, excelBuffer);
+    } catch (error) {
+      console.error("Click log Excel export failed:", error);
+      exportWarnings.push("Excel export failed. JSON was saved.");
+    }
+
+    try {
+      await writeCsvAndSqliteExports(dataDir, "click-logs-results", [
+        { name: "clickRows", rows: nextFile.clickRows },
+      ]);
+    } catch (error) {
+      console.error("Click log CSV/SQLite export failed:", error);
+      exportWarnings.push("CSV/SQLite export failed. JSON was saved.");
+    }
+
     return NextResponse.json({
       success: true,
       savedRows: rowsToSave.length,
       totalRows: nextFile.clickRows.length,
+      exportWarnings,
+      excelPath: "data/click-logs-results.xlsx",
+      jsonPath: "data/click-logs-results.json",
+      csvPath: "data/click-logs-results.csv",
+      sqlitePath: "data/click-logs-results.sqlite",
     });
   } catch (error) {
     console.error("Click log save failed:", error);

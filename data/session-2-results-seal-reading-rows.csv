@@ -1,0 +1,6 @@
+participant_id,location,session_number,seal_id,seal_name,opened_description,opened_at,agreed_to_descriptions,timestamp
+PUCPR-1782234486787-S4230J,PUCPR,2,green-1,Selo de Carne Bovina,Yes,2026-06-23T17:08:23.408Z,Yes,2026-06-23T17:08:48.698Z
+PUCPR-1782234486787-S4230J,PUCPR,2,red-1,Certificação Angus,Yes,2026-06-23T17:08:25.041Z,Yes,2026-06-23T17:08:48.698Z
+PUCPR-1782234486787-S4230J,PUCPR,2,green-2,Certificação Carne Cultivada,Yes,2026-06-23T17:08:26.017Z,Yes,2026-06-23T17:08:48.698Z
+PUCPR-1782234486787-S4230J,PUCPR,2,red-2,Certificação Bem-Estar Animal,Yes,2026-06-23T17:08:27.015Z,Yes,2026-06-23T17:08:48.698Z
+PUCPR-1782234486787-S4230J,PUCPR,2,green-3,Certificação Orgânica,Yes,2026-06-23T17:08:27.996Z,Yes,2026-06-23T17:08:48.698Z

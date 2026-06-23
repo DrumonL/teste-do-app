@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type MouseEvent } from "react";
+import { useRef, useState, type MouseEvent, type PointerEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import ProductCard from "@/components/ProductCard";
 import ConfirmModal from "@/components/ConfirmModal";
@@ -18,6 +18,8 @@ export type ClickLogRow = {
   option_id?: string;
   seal_id?: string;
   rank_number?: number | string;
+  from_rank?: number | string;
+  to_rank?: number | string;
   condition_id?: string;
   price_brl?: number | string;
   price?: number | string;
@@ -77,6 +79,8 @@ type RankingScreenProps = {
   sealZoom?: boolean;
   showPriceInCart?: boolean;
   clickedSealIds?: Set<string>;
+  initialRanking?: RankingOption[];
+  initialClickLogs?: ClickLogRow[];
   onRankingComplete: (
     ranking: RankingOption[],
     clickLogs?: ClickLogRow[]
@@ -89,6 +93,13 @@ const locationColors: Record<string, string> = {
   UFBA: "#1a7a3a",
   NMSU: "#bb0b0b",
 };
+
+function moveItem<T>(items: T[], fromIndex: number, toIndex: number) {
+  const nextItems = [...items];
+  const [movedItem] = nextItems.splice(fromIndex, 1);
+  nextItems.splice(toIndex, 0, movedItem);
+  return nextItems;
+}
 
 function formatOptionPrice(option: RankingOption) {
   if (typeof option.price !== "number") {
@@ -114,15 +125,22 @@ export default function RankingScreen({
   sealZoom,
   showPriceInCart,
   clickedSealIds,
+  initialRanking = [],
+  initialClickLogs = [],
   onRankingComplete,
   onSealClick,
 }: RankingScreenProps) {
   const { t } = useLanguage();
 
-  const [availableOptions, setAvailableOptions] = useState(options);
-  const [selectedRanking, setSelectedRanking] = useState<RankingOption[]>([]);
+  const [availableOptions, setAvailableOptions] = useState(() => {
+    const selectedIds = new Set(initialRanking.map((option) => option.id));
+    return options.filter((option) => !selectedIds.has(option.id));
+  });
+  const [selectedRanking, setSelectedRanking] = useState<RankingOption[]>(initialRanking);
   const [pendingOption, setPendingOption] = useState<RankingOption | null>(null);
-  const [clickLogs, setClickLogs] = useState<ClickLogRow[]>([]);
+  const [clickLogs, setClickLogs] = useState<ClickLogRow[]>(initialClickLogs);
+  const [draggedCartOptionId, setDraggedCartOptionId] = useState<string | null>(null);
+  const draggedCartOptionIdRef = useRef<string | null>(null);
 
   const [screenStartedAt, setScreenStartedAt] = useState(() => new Date());
   const [optionSelectedAt, setOptionSelectedAt] = useState<Date | null>(null);
@@ -131,6 +149,7 @@ export default function RankingScreen({
   const [preferenceChanged, setPreferenceChanged] = useState(false);
 
   const currentRank = selectedRanking.length + 1;
+  const isPucprReorderEnabled = location === "PUCPR";
 
   const stepKeys: TranslationKey[] = [
     "ranking.step1",
@@ -207,6 +226,46 @@ export default function RankingScreen({
     const row = makeClickLog(event, details);
     setClickLogs((current) => [...current, row]);
     return row;
+  }
+
+  function makeCartReorderLog(
+    option: RankingOption,
+    fromRank: number,
+    toRank: number,
+    clientX: number,
+    clientY: number
+  ): ClickLogRow {
+    return {
+      participant_id: participantId || "",
+      location: location || "",
+      session_number: sessionNumber,
+      session_suffix: sessionSuffix || "",
+      screen_name: `session-${sessionNumber}-ranking`,
+      event_type: "selected_ranking_reorder_drag",
+      element_id: option.id,
+      element_label: `${option.title}${option.subtitle ? ` - ${option.subtitle}` : ""}`,
+      option_id: option.id,
+      seal_id: option.sealId || "",
+      rank_number: toRank,
+      from_rank: fromRank,
+      to_rank: toRank,
+      condition_id: option.conditionId || "",
+      price_brl:
+        option.priceCurrency === "BRL"
+          ? option.price ?? ""
+          : "",
+      price: option.price ?? "",
+      price_currency: option.priceCurrency ?? "",
+      price_unit: option.priceUnit ?? "",
+      price_increase_percent: option.priceIncreasePercent ?? "",
+      x_position: clientX,
+      y_position: clientY,
+      viewport_width:
+        typeof window !== "undefined" ? window.innerWidth : "",
+      viewport_height:
+        typeof window !== "undefined" ? window.innerHeight : "",
+      clicked_at: new Date().toISOString(),
+    };
   }
 
   function resetChoiceTracking() {
@@ -369,6 +428,78 @@ export default function RankingScreen({
     resetChoiceTracking();
   }
 
+  function reorderSelectedRankingOverTarget(
+    targetId: string,
+    clientX: number,
+    clientY: number
+  ) {
+    const currentId = draggedCartOptionIdRef.current;
+
+    if (!isPucprReorderEnabled || !currentId || currentId === targetId) return;
+
+    setSelectedRanking((currentRanking) => {
+      const fromIndex = currentRanking.findIndex((option) => option.id === currentId);
+      const toIndex = currentRanking.findIndex((option) => option.id === targetId);
+
+      if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) {
+        return currentRanking;
+      }
+
+      const movedOption = currentRanking[fromIndex];
+
+      setClickLogs((currentLogs) => [
+        ...currentLogs,
+        makeCartReorderLog(
+          movedOption,
+          fromIndex + 1,
+          toIndex + 1,
+          clientX,
+          clientY
+        ),
+      ]);
+
+      return moveItem(currentRanking, fromIndex, toIndex);
+    });
+  }
+
+  function handleCartPointerDown(
+    event: PointerEvent<HTMLLIElement>,
+    optionId: string
+  ) {
+    if (!isPucprReorderEnabled) return;
+    if ((event.target as HTMLElement).closest("button")) return;
+
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    draggedCartOptionIdRef.current = optionId;
+    setDraggedCartOptionId(optionId);
+  }
+
+  function handleCartPointerMove(event: PointerEvent<HTMLLIElement>) {
+    if (!isPucprReorderEnabled || !draggedCartOptionIdRef.current) return;
+
+    const target = document
+      .elementFromPoint(event.clientX, event.clientY)
+      ?.closest<HTMLElement>("[data-cart-option-id]");
+
+    const targetId = target?.dataset.cartOptionId;
+
+    if (targetId) {
+      reorderSelectedRankingOverTarget(targetId, event.clientX, event.clientY);
+    }
+  }
+
+  function handleCartPointerEnd(event: PointerEvent<HTMLLIElement>) {
+    if (!isPucprReorderEnabled) return;
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    draggedCartOptionIdRef.current = null;
+    setDraggedCartOptionId(null);
+  }
+
   function handleRankingCompleteClick(event?: MouseEvent<HTMLButtonElement>) {
     const completeClick = makeClickLog(event, {
       eventType: "ranking_complete_click",
@@ -402,9 +533,11 @@ export default function RankingScreen({
           <span>{description ?? t("ranking.instruction")}</span>
         </div>
 
-        <button type="button" onClick={handleClearSelections}>
-          {t("ranking.clear")}
-        </button>
+        {location !== "PUCPR" && (
+          <button type="button" onClick={handleClearSelections}>
+            {t("ranking.clear")}
+          </button>
+        )}
       </header>
 
       <div className="ranking-layout">
@@ -488,9 +621,35 @@ export default function RankingScreen({
               <p>{t("ranking.cartEmptyDesc")}</p>
             </div>
           ) : (
-            <ol className="cart-list">
+            <>
+            {isPucprReorderEnabled && (
+              <p className="cart-reorder-instruction">
+                {t("final.dragInstruction")}
+              </p>
+            )}
+            <ol
+              className={
+                isPucprReorderEnabled
+                  ? "cart-list cart-list--reorderable"
+                  : "cart-list"
+              }
+            >
               {selectedRanking.map((option, index) => (
-                <li key={option.id} className="cart-item">
+                <li
+                  key={option.id}
+                  data-cart-option-id={option.id}
+                  className={
+                    isPucprReorderEnabled && draggedCartOptionId === option.id
+                      ? "cart-item cart-item--draggable cart-item--dragging"
+                      : isPucprReorderEnabled
+                        ? "cart-item cart-item--draggable"
+                        : "cart-item"
+                  }
+                  onPointerDown={(event) => handleCartPointerDown(event, option.id)}
+                  onPointerMove={handleCartPointerMove}
+                  onPointerUp={handleCartPointerEnd}
+                  onPointerCancel={handleCartPointerEnd}
+                >
                   <div className="cart-rank">#{index + 1}</div>
 
                   <div className="cart-item-info">
@@ -515,6 +674,7 @@ export default function RankingScreen({
                 </li>
               ))}
             </ol>
+            </>
           )}
 
           {selectedRanking.length === options.length && (

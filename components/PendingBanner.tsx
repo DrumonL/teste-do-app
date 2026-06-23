@@ -18,7 +18,9 @@ export default function PendingBanner() {
     async function tick() {
       if (cancelled) return;
 
-      if (getPendingCount() > 0 && !busyLocal) {
+      const pendingCount = await getPendingCount();
+
+      if (pendingCount > 0 && !busyLocal) {
         busyLocal = true;
         setBusy(true);
         await flushPending();
@@ -27,7 +29,7 @@ export default function PendingBanner() {
       }
 
       if (!cancelled) {
-        setPending(getPendingCount());
+        setPending(await getPendingCount());
         timer = setTimeout(tick, POLL_INTERVAL_MS);
       }
     }
@@ -37,7 +39,9 @@ export default function PendingBanner() {
       tick();
     }
 
-    setPending(getPendingCount());
+    getPendingCount().then((count) => {
+      if (!cancelled) setPending(count);
+    });
     timer = setTimeout(tick, INITIAL_DELAY_MS);
     window.addEventListener("focus", onFocus);
 

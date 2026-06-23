@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import fs from "fs";
 import path from "path";
+import { writeCsvAndSqliteExports } from "@/lib/dataExports";
 import { withFileLock } from "@/lib/fileLock";
 
 export const runtime = "nodejs";
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
       fs.mkdirSync(dataDir, { recursive: true });
     }
 
-    const result = await withFileLock(jsonPath, () => {
+    const result = await withFileLock(jsonPath, async () => {
       let store: ResultsStore = {
         participantRows: [],
         longRows: [],
@@ -85,6 +86,11 @@ export async function POST(request: Request) {
 
       fs.writeFileSync(excelPath, excelBuffer);
 
+      await writeCsvAndSqliteExports(dataDir, "session-1-results", [
+        { name: "participantRows", rows: store.participantRows },
+        { name: "longRows", rows: store.longRows },
+      ]);
+
       return {
         participantRowsCount: store.participantRows.length,
         longRowsCount: store.longRows.length,
@@ -98,6 +104,11 @@ export async function POST(request: Request) {
       longRows: result.longRowsCount,
       excelPath: "data/session-1-results.xlsx",
       jsonPath: "data/session-1-results.json",
+      csvPaths: [
+        "data/session-1-results-participant-rows.csv",
+        "data/session-1-results-long-rows.csv",
+      ],
+      sqlitePath: "data/session-1-results.sqlite",
     });
   } catch (error) {
     console.error("Failed to save Session 1 data:", error);

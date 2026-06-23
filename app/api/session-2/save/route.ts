@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import fs from "fs";
 import path from "path";
+import { writeCsvAndSqliteExports } from "@/lib/dataExports";
 import { withFileLock } from "@/lib/fileLock";
 
 export const runtime = "nodejs";
@@ -55,7 +56,7 @@ export async function POST(request: Request) {
       fs.mkdirSync(dataDir, { recursive: true });
     }
 
-    const result = await withFileLock(jsonPath, () => {
+    const result = await withFileLock(jsonPath, async () => {
       let store: ResultsStore = {
         participantRows: [],
         longRows: [],
@@ -103,6 +104,18 @@ export async function POST(request: Request) {
 
       fs.writeFileSync(excelPath, excelBuffer);
 
+      await writeCsvAndSqliteExports(dataDir, "session-2-results", [
+        { name: "participantRows", rows: store.participantRows },
+        { name: "longRows", rows: store.longRows },
+        { name: "sealReadingRows", rows: store.sealReadingRows },
+        {
+          name: "rankingSealClickRows",
+          rows: store.rankingSealClickRows.length
+            ? store.rankingSealClickRows
+            : [{ note: "No ranking seal clicks recorded" }],
+        },
+      ]);
+
       return {
         participantRowsCount: store.participantRows.length,
         longRowsCount: store.longRows.length,
@@ -118,6 +131,13 @@ export async function POST(request: Request) {
       sealReadingRows: result.sealReadingRowsCount,
       excelPath: "data/session-2-results.xlsx",
       jsonPath: "data/session-2-results.json",
+      csvPaths: [
+        "data/session-2-results-participant-rows.csv",
+        "data/session-2-results-long-rows.csv",
+        "data/session-2-results-seal-reading-rows.csv",
+        "data/session-2-results-ranking-seal-click-rows.csv",
+      ],
+      sqlitePath: "data/session-2-results.sqlite",
     });
   } catch (error) {
     console.error("Failed to save Session 2 data:", error);

@@ -356,7 +356,13 @@
   }
 
   .final-ranking-list li {
-    grid-template-columns: 64px 84px 1fr;
+    grid-template-columns: 52px 78px minmax(0, 1fr);
+    column-gap: 10px;
+    padding: 10px;
+  }
+
+  .final-ranking-text {
+    min-width: 0;
   }
 }
 

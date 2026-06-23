@@ -384,8 +384,6 @@ export default function SessionTwoDescriptionsPage() {
   }
 
   function handleFinalConfirmationNo() {
-    setCompletedRanking([]);
-    setRankingClickLogs([]);
     setStep("ranking");
   }
 
@@ -788,6 +786,8 @@ export default function SessionTwoDescriptionsPage() {
               description={t("s2.rankingDesc")}
               location={participantLocation}
               participantId={participantId}
+              initialRanking={completedRanking}
+              initialClickLogs={rankingClickLogs}
               onRankingComplete={handleRankingComplete}
               onSealClick={(sealId) => {
                 const seal = getSealById(sealId);

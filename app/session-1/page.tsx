@@ -153,8 +153,6 @@ export default function SessionOnePage() {
   }
 
   function handleFinalConfirmationNo() {
-    setCompletedRanking([]);
-    setRankingClickLogs([]);
     setStep("ranking");
   }
 
@@ -333,10 +331,24 @@ export default function SessionOnePage() {
 
   addRankingTimingFields(participantRow, completedRanking);
 
+  const clickRows = rankingClickLogs.map((row) => ({
+    ...row,
+    participant_id: participantId,
+    location: participantLocation,
+    session_number: 1,
+    timestamp,
+  }));
+
   const result = await saveWithRetry("/api/session-1/save", {
     participantRow,
     longRows,
   });
+
+  if (clickRows.length > 0) {
+    await saveWithRetry("/api/click-logs/save", {
+      clickRows,
+    });
+  }
 
   localStorage.setItem("session-1-ranking", JSON.stringify(longRows));
   localStorage.setItem("session-1-demographics", JSON.stringify(demographics));
@@ -365,6 +377,8 @@ export default function SessionOnePage() {
             location={participantLocation}
             participantId={participantId}
             sealZoom={true}
+            initialRanking={completedRanking}
+            initialClickLogs={rankingClickLogs}
             onRankingComplete={handleRankingComplete}
           />
         )}

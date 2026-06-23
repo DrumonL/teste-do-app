@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import fs from "fs";
 import path from "path";
+import { writeCsvAndSqliteExports } from "@/lib/dataExports";
 import { withFileLock } from "@/lib/fileLock";
 
 export const runtime = "nodejs";
@@ -148,7 +149,7 @@ export async function POST(request: Request) {
       full_survey_saved_at: new Date().toISOString(),
     };
 
-    const participantRowsCount = await withFileLock(jsonPath, () => {
+    const participantRowsCount = await withFileLock(jsonPath, async () => {
       let store: ResultsStore = {
         participantRows: [],
       };
@@ -197,6 +198,10 @@ export async function POST(request: Request) {
 
       fs.writeFileSync(excelPath, excelBuffer);
 
+      await writeCsvAndSqliteExports(dataDir, "full-survey-results", [
+        { name: "participantRows", rows: store.participantRows },
+      ]);
+
       return store.participantRows.length;
     });
 
@@ -206,6 +211,8 @@ export async function POST(request: Request) {
       participantRows: participantRowsCount,
       excelPath: "data/full-survey-results.xlsx",
       jsonPath: "data/full-survey-results.json",
+      csvPath: "data/full-survey-results.csv",
+      sqlitePath: "data/full-survey-results.sqlite",
     });
   } catch (error) {
     console.error("Failed to save full survey file:", error);
