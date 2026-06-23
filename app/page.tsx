@@ -10,7 +10,6 @@ import {
   getLocalBackups,
   getLocalBackupStats,
   getPendingCount,
-  markBackupExported,
   type LocalBackupStats,
 } from "@/lib/saveWithRetry";
 
@@ -107,7 +106,7 @@ export default function HomePage() {
     backupCount: 0,
     participantCount: 0,
     eventCount: 0,
-    lastBackupAt: "",
+    lastSavedAt: "",
   });
   const [syncingPending, setSyncingPending] = useState(false);
   const [helpMessage, setHelpMessage] = useState("");
@@ -203,7 +202,7 @@ export default function HomePage() {
   async function handleExportBackup() {
     const backups = await getLocalBackups();
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const exportedAt = await markBackupExported();
+    const exportedAt = new Date().toISOString();
     const rows = flattenBackupRows(backups);
     const csv = buildBackupCsv(rows);
     const XLSX = await import("xlsx");
@@ -333,12 +332,10 @@ export default function HomePage() {
             </p>
             <div className="help-stats">
               <span>Participantes: {backupStats.participantCount}</span>
-              <span>Eventos: {backupStats.eventCount}</span>
-              <span>Backups: {backupStats.backupCount}</span>
               <span>
-                Último backup:{" "}
-                {backupStats.lastBackupAt
-                  ? new Date(backupStats.lastBackupAt).toLocaleString("pt-BR")
+                Último dado salvo: {" "}
+                {backupStats.lastSavedAt
+                  ? new Date(backupStats.lastSavedAt).toLocaleString("pt-BR")
                   : "nenhum"}
               </span>
             </div>

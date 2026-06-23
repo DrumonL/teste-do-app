@@ -75,7 +75,7 @@ const dictionary = {
     "s1.saving": "Salvando...",
     "s1.completedTitle": "Sessão 1 Concluída",
     "s1.rankingTitle": "Abaixo há 5 opções de carne bovina para sua escolha",
-    "s1.rankingDesc": "Descubra diferentes opções de picanha bovina disponíveis nesta seleção especial. Caso queira, clique nos selos de certificação para visualizar melhor os detalhes. Selecione um produto por vez de acordo com sua preferência. Os produtos selecionados desapareceram da tela.",
+    "s1.rankingDesc": "Analise as opções de picanha bovina apresentadas abaixo. Observe os selos de certificação presentes em cada opção e selecione um produto por vez conforme sua preferência. Os produtos selecionadas desaparecerão da tela.",
 
     "s2.introBadge": "Sessão 2",
     "s2.introTitle": "Informações adicionais disponíveis",
@@ -239,7 +239,7 @@ const dictionary = {
     "s1.saving": "Saving...",
     "s1.completedTitle": "Session 1 Completed",
     "s1.rankingTitle": "Below are 5 beef options for your choice",
-    "s1.rankingDesc": "Discover different beef top sirloin options available in this special selection. If you wish, click the certification seals to view the details. Select one product at a time according to your preference. Selected products will disappear from the screen.",
+    "s1.rankingDesc": "Analyze the beef top sirloin options presented below. Observe the certification seals on each product and select one product at a time according to your preference. Selected products will disappear from the screen.",
 
     "s2.introBadge": "Session 2",
     "s2.introTitle": "Additional information available",

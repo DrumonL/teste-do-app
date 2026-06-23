@@ -33,7 +33,7 @@ export type LocalBackupStats = {
   backupCount: number;
   participantCount: number;
   eventCount: number;
-  lastBackupAt: string;
+  lastSavedAt: string;
 };
 
 let migrationPromise: Promise<void> | null = null;
@@ -245,28 +245,14 @@ export async function getLocalBackups(): Promise<LocalBackup[]> {
   }
 }
 
-export async function getLastBackupAt(): Promise<string> {
+export async function getLastDataSavedAt(): Promise<string> {
   if (typeof window === "undefined" || !canUseIndexedDb()) return "";
 
   try {
-    return await getMetadataValue("lastBackupAt");
+    return await getMetadataValue("lastDataSavedAt");
   } catch {
     return "";
   }
-}
-
-export async function markBackupExported(): Promise<string> {
-  const exportedAt = new Date().toISOString();
-
-  if (typeof window !== "undefined" && canUseIndexedDb()) {
-    try {
-      await setMetadataValue("lastBackupAt", exportedAt);
-    } catch {
-      localStorage.setItem("lastBackupAt", exportedAt);
-    }
-  }
-
-  return exportedAt;
 }
 
 export async function getLocalBackupStats(): Promise<LocalBackupStats> {
@@ -282,7 +268,7 @@ export async function getLocalBackupStats(): Promise<LocalBackupStats> {
       (total, backup) => total + countClickEvents(backup.body),
       0
     ),
-    lastBackupAt: await getLastBackupAt(),
+    lastSavedAt: await getLastDataSavedAt(),
   };
 }
 
@@ -298,6 +284,7 @@ async function saveLocalBackup(url: string, body: unknown) {
 
   try {
     await addLocalBackup(item);
+    await setMetadataValue("lastDataSavedAt", item.createdAt);
   } catch {
     // Keep network saving available even if browser storage is blocked/full.
   }
