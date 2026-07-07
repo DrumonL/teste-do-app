@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./mobile.css";
 import PendingBanner from "@/components/PendingBanner";
+import ViewportDebugPanel from "@/components/ViewportDebugPanel";
 import { LanguageProvider } from "@/lib/i18n";
 import Providers from "./providers";
 
@@ -20,6 +21,7 @@ export default function RootLayout({
       <body>
         <LanguageProvider>
           <PendingBanner />
+          <ViewportDebugPanel />
           <Providers>{children}</Providers>
         </LanguageProvider>
       </body>
