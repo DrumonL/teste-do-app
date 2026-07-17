@@ -746,23 +746,6 @@ input {
   }
 }
 
-.modal-seal-check {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  width: 36px;
-  height: 36px;
-  border: 2px solid #1a7a3a;
-  border-radius: 999px;
-  color: #1a7a3a;
-  font-size: 18px;
-  font-weight: 900;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-}
-
 .modal-card h2 {
   margin: 0;
   font-size: 30px;
@@ -989,10 +972,6 @@ input {
 .cart-item--dragging .cart-rank {
   background: #ead8c4;
   color: #000000;
-}
-
-.location-pucpr .cart-list--reorderable .cart-item button {
-  display: none;
 }
 
 .cart-rank {
@@ -1531,30 +1510,6 @@ input {
   margin: 8px 0 0;
   color: #6b5b4c;
   font-weight: 700;
-}
-
-.read-check {
-  color: #1a7a3a;
-  background: none;
-  border: 2px solid #1a7a3a;
-  border-radius: 999px;
-  justify-content: center;
-  align-items: center;
-  width: 40px;
-  height: 40px;
-  font-size: 22px;
-  font-weight: 900;
-  transition: background .2s, color .2s, border-color .2s;
-  display: flex;
-  position: absolute;
-  top: 27px;
-  right: 26px;
-}
-
-.read-check--empty {
-  background: transparent;
-  border: 2px solid #c8bfb5;
-  color: #c8bfb5;
 }
 
 .seal-modal-card {

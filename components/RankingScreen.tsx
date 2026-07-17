@@ -520,13 +520,8 @@ export default function RankingScreen({
 
   return (
     <div className="ranking-area">
-      <header
-        className={
-          selectedRanking.length === options.length
-            ? "ranking-toolbar ranking-toolbar--complete"
-            : "ranking-toolbar"
-        }
-      >
+      {!(isReorderEnabled && selectedRanking.length === options.length) && (
+      <header className="ranking-toolbar">
         <div>
           <p>
             {t("common.session")} {sessionNumber}
@@ -543,7 +538,7 @@ export default function RankingScreen({
           <span>{description ?? t("ranking.instruction")}</span>
         </div>
 
-        {location !== "PUCPR" && (
+        {!isReorderEnabled && (
           <button
             type="button"
             className="clear-selections-button"
@@ -553,6 +548,7 @@ export default function RankingScreen({
           </button>
         )}
       </header>
+      )}
 
       <div className="ranking-layout">
         <section className="product-grid">
@@ -624,9 +620,11 @@ export default function RankingScreen({
               <h3>{t("ranking.cartSubtitle")}</h3>
             </div>
 
-            <span>
-              {selectedRanking.length}/{options.length}
-            </span>
+            {!isReorderEnabled && (
+              <span>
+                {selectedRanking.length}/{options.length}
+              </span>
+            )}
           </div>
 
           {selectedRanking.length === 0 ? (
@@ -706,13 +704,15 @@ export default function RankingScreen({
                       )}
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={(event) => removeFromCart(option.id, event)}
-                    aria-label={`${t("ranking.removeAria")} ${option.title}`}
-                  >
-                    x
-                  </button>
+                  {!isReorderEnabled && (
+                    <button
+                      type="button"
+                      onClick={(event) => removeFromCart(option.id, event)}
+                      aria-label={`${t("ranking.removeAria")} ${option.title}`}
+                    >
+                      x
+                    </button>
+                  )}
                 </motion.li>
                 );
               })}

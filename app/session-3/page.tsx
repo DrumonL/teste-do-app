@@ -690,7 +690,9 @@ export default function SessionThreePage() {
         <StepTransition stepKey={step}>
         {step === "transition" && (
           <section className="complete-card session-transition-card completed-step-card">
-            <div className="badge" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>{t("s3.introBadge")}</div>
+            {participantLocation === "NMSU" && (
+              <div className="badge" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>{t("s3.introBadge")}</div>
+            )}
             <h2>{t("s3.introTitle")}</h2>
             <p>
               {t("s3.introDesc")}
@@ -731,7 +733,7 @@ export default function SessionThreePage() {
         {step === "between-screens" && (
           <section className="complete-card between-choices-card">
             <div className="badge" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>{t("s3.choiceSuffix")} {screenRankings.length} {t("s3.choiceOf")} 3</div>
-            <h2>{t("s3.betweenTitle")}</h2>
+            {participantLocation === "NMSU" && <h2>{t("s3.betweenTitle")}</h2>}
             <p>
               {t("s3.betweenDesc2")}
             </p>
@@ -774,7 +776,6 @@ export default function SessionThreePage() {
       {activeSeal && (
         <div className="modal-backdrop">
           <section className="modal-card seal-modal-card">
-            <div className="modal-seal-check">✓</div>
             <img src={activeSeal.sealImageUrl} alt={t(activeSeal.nameKey)} />
 
             <h2>{t(activeSeal.nameKey)}</h2>

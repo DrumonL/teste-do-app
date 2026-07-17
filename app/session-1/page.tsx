@@ -403,7 +403,9 @@ export default function SessionOnePage() {
 
         {step === "final-confirmation" && (
           <section className="complete-card final-confirmation-card">
-            <div className="badge" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>{t("s1.badge")}</div>
+            {participantLocation === "NMSU" && (
+              <div className="badge" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>{t("s1.badge")}</div>
+            )}
             <h2>{t("s1.confirmTitle")}</h2>
             <p>
               {t("s1.confirmDesc")}
@@ -469,7 +471,9 @@ export default function SessionOnePage() {
 
         {step === "completed" && (
           <section className="complete-card completed-step-card">
-            <div className="badge" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>{t("common.completed")}</div>
+            {participantLocation === "NMSU" && (
+              <div className="badge" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>{t("common.completed")}</div>
+            )}
             <h2>{t("s1.completedTitle")}</h2>
             <p>{t("common.clickContinue1")} <strong>{t("common.continue")}</strong> {t("common.clickContinue2")}</p>
 

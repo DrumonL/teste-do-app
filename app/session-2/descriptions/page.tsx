@@ -741,8 +741,6 @@ export default function SessionTwoDescriptionsPage() {
                     <div className="seal-image-holder">
                       <img src={seal.imageUrl} alt={t(seal.nameKey)} />
                     </div>
-
-                    <div className={wasRead ? "read-check" : "read-check read-check--empty"}>✓</div>
                   </button>
                 );
               })}
@@ -774,7 +772,9 @@ export default function SessionTwoDescriptionsPage() {
 
         {step === "agreement" && (
           <section className="complete-card seal-agreement-card">
-            <div className="badge" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>{t("s2.confirmBadge")}</div>
+            {participantLocation === "NMSU" && (
+              <div className="badge" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>{t("s2.confirmBadge")}</div>
+            )}
             <h2>{t("s2.confirmTitle")}</h2>
             <p>
               {t("s2.confirmDesc")}
@@ -829,7 +829,9 @@ export default function SessionTwoDescriptionsPage() {
 
         {step === "final-confirmation" && (
           <section className="complete-card final-confirmation-card">
-            <div className="badge" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>{t("s2.finalBadge")}</div>
+            {participantLocation === "NMSU" && (
+              <div className="badge" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>{t("s2.finalBadge")}</div>
+            )}
             <h2>{t("s2.finalTitle")}</h2>
             <p>
               {t("s2.finalDesc")}
@@ -895,7 +897,9 @@ export default function SessionTwoDescriptionsPage() {
 
         {step === "completed" && (
           <section className="complete-card completed-step-card">
-            <div className="badge" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>{t("common.completed")}</div>
+            {participantLocation === "NMSU" && (
+              <div className="badge" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>{t("common.completed")}</div>
+            )}
             <h2>{t("s2.completedTitle")}</h2>
             <p>{t("common.clickContinue1")} <strong>{t("common.continue")}</strong> {t("common.clickContinue2")}</p>
 
@@ -912,7 +916,6 @@ export default function SessionTwoDescriptionsPage() {
       {activeSeal && (
         <div className="modal-backdrop">
           <section className="modal-card seal-modal-card">
-            <div className="modal-seal-check">✓</div>
             <img src={activeSeal.imageUrl} alt={t(activeSeal.nameKey)} />
 
             <h2>{t(activeSeal.nameKey)}</h2>

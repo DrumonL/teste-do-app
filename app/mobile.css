@@ -436,10 +436,6 @@
     grid-template-columns: 48px minmax(0, 1fr);
   }
 
-  .selection-cart .cart-item button {
-    display: none;
-  }
-
   .location-ufba .cart-rank {
     background: #cfead8;
     width: 56px;
@@ -450,10 +446,6 @@
   .location-ufba .selection-cart .cart-item {
     background: #ffffff;
     border: 1px solid #d8e7dc;
-  }
-
-  .location-ufba .cart-header > span {
-    display: none;
   }
 
   .location-ufba .cart-reorder-instruction {
@@ -524,10 +516,6 @@
     font-size: 18px;
   }
 
-  .location-ufba .final-confirmation-card > .badge {
-    display: none;
-  }
-
   .location-ufba .session-transition-card > .badge,
   .location-ufba .between-choices-card > .badge {
     color: #ffffff;
@@ -536,10 +524,6 @@
   .location-ufba .between-choices-card h2,
   .location-ufba .between-choices-card > p {
     text-align: left;
-  }
-
-  .location-ufba .between-choices-card h2 {
-    display: none;
   }
 
   .location-ufba .between-choices-card > p {
@@ -628,18 +612,6 @@
     line-height: 1.25;
   }
 
-  .location-ufba .read-check {
-    display: none;
-  }
-
-  .location-ufba .modal-seal-check {
-    display: none;
-  }
-
-  .location-ufba .seal-agreement-card > .badge {
-    display: none;
-  }
-
   .location-ufba .seal-agreement-card h2 {
     color: #2a1d14;
     margin: 4px;
@@ -650,10 +622,6 @@
     margin: 9px 5px 0;
     font-size: 18px;
     line-height: 1.3;
-  }
-
-  .location-ufba .completed-step-card > .badge {
-    display: none;
   }
 
   .location-ufba .completed-step-card h2 {
@@ -697,10 +665,6 @@
     border-color: #1a1a1a;
   }
 
-  .location-ufba .ranking-toolbar--complete {
-    display: none;
-  }
-
   .location-ufba .final-confirmation-card {
     border-color: #1a1a1a;
   }
@@ -728,9 +692,6 @@
     font-size: 20px;
   }
 
-  .clear-selections-button {
-    display: none;
-  }
 }
 
 @media (max-width: 680px) {
@@ -788,10 +749,6 @@
   .location-pucpr .selection-cart .cart-item {
     background: #ffffff;
     border: 1px solid #ead8d8;
-  }
-
-  .location-pucpr .cart-header > span {
-    display: none;
   }
 
   .location-pucpr .cart-reorder-instruction {
@@ -867,10 +824,6 @@
     font-size: 18px;
   }
 
-  .location-pucpr .final-confirmation-card > .badge {
-    display: none;
-  }
-
   .location-pucpr .complete-card h2 {
     color: #2a1d14;
     margin: 4px;
@@ -887,10 +840,6 @@
     text-align: left;
   }
 
-  .location-pucpr .between-choices-card h2 {
-    display: none;
-  }
-
   .location-pucpr .between-choices-card > p {
     margin: 12px 0 12px 5px;
     font-size: 18px;
@@ -898,10 +847,6 @@
 
   .location-pucpr .between-choices-card .primary-button {
     font-size: 18px;
-  }
-
-  .location-pucpr .completed-step-card > .badge {
-    display: none;
   }
 
   .location-pucpr .completed-step-card h2 {
@@ -927,18 +872,6 @@
 
   .location-pucpr .session-transition-card.completed-step-card > p {
     margin-bottom: 16px;
-  }
-
-  .location-pucpr .read-check {
-    display: none;
-  }
-
-  .location-pucpr .modal-seal-check {
-    display: none;
-  }
-
-  .location-pucpr .seal-agreement-card > .badge {
-    display: none;
   }
 
   .location-pucpr .seal-agreement-card > p {
@@ -969,10 +902,6 @@
 
   .location-pucpr .secondary-button {
     border-color: #1a1a1a;
-  }
-
-  .location-pucpr .ranking-toolbar--complete {
-    display: none;
   }
 
   .location-pucpr .final-confirmation-card {
@@ -1058,15 +987,6 @@
     font-weight: 900;
     cursor: pointer;
     box-shadow: 0 12px 24px #f3eadc29;
-  }
-
-  .read-check {
-    width: 35px;
-    height: 35px;
-    font-size: 22px;
-    font-weight: 900;
-    top: 15px;
-    right: 15px;
   }
 
   .seal-description-card {
