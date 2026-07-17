@@ -711,7 +711,7 @@ export default function RankingScreen({
                     onClick={(event) => removeFromCart(option.id, event)}
                     aria-label={`${t("ranking.removeAria")} ${option.title}`}
                   >
-                    Ã—
+                    x
                   </button>
                 </motion.li>
                 );
