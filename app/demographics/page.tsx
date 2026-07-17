@@ -58,17 +58,14 @@ export default function DemographicsPage() {
             />
           </section>
         ) : (
-          <section className="complete-card">
-            <div
-              className="badge"
-              style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}
-            >
-              {t("common.completed")}
-            </div>
-            <h2 style={{ marginTop: "16px" }}>{t("s3.completedTitle")}</h2>
-            <p>{t("s3.completedDesc")}</p>
+          <section className="complete-card final-thank-you-card">
+            <h2>{t("s3.completedTitle")}</h2>
+            <p>
+              {t("s3.completedDesc.prefix")} <strong>{t("s3.finish")}</strong>{" "}
+              {t("s3.completedDesc.suffix")}
+            </p>
 
-            <div style={{ marginTop: "24px" }}>
+            <div className="final-thank-you-actions">
               <a
                 href="/"
                 className="primary-link-button"

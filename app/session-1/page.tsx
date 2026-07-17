@@ -90,6 +90,24 @@ export default function SessionOnePage() {
     setParticipantLocation(localStorage.getItem("participantLocation") || "UNKNOWN");
   }, []);
 
+  useEffect(() => {
+    if (!zoomedSealId) return;
+
+    function handlePointerDown(event: PointerEvent) {
+      if ((event.target as HTMLElement).closest(".final-seal-zoom-btn")) {
+        return;
+      }
+
+      setZoomedSealId(null);
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [zoomedSealId]);
+
   const randomizationSeed = useMemo(() => {
     return participantId ? `${participantId}-session-1` : "demo-session-1";
   }, [participantId]);
@@ -384,7 +402,7 @@ export default function SessionOnePage() {
         )}
 
         {step === "final-confirmation" && (
-          <section className="complete-card">
+          <section className="complete-card final-confirmation-card">
             <div className="badge" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>{t("s1.badge")}</div>
             <h2>{t("s1.confirmTitle")}</h2>
             <p>
@@ -444,13 +462,13 @@ export default function SessionOnePage() {
         )}
 
         {step === "demographics" && (
-          <section className="complete-card">
+          <section className="complete-card demographics-card">
             <DemographicsForm onSubmit={exportExcel} locationColor={locationColors[participantLocation] ?? "#bb0b0b"} />
           </section>
         )}
 
         {step === "completed" && (
-          <section className="complete-card">
+          <section className="complete-card completed-step-card">
             <div className="badge" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>{t("common.completed")}</div>
             <h2>{t("s1.completedTitle")}</h2>
             <p>{t("common.clickContinue1")} <strong>{t("common.continue")}</strong> {t("common.clickContinue2")}</p>

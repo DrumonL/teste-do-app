@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRef, useState, type MouseEvent, type PointerEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -140,6 +140,7 @@ export default function RankingScreen({
   const [pendingOption, setPendingOption] = useState<RankingOption | null>(null);
   const [clickLogs, setClickLogs] = useState<ClickLogRow[]>(initialClickLogs);
   const [draggedCartOptionId, setDraggedCartOptionId] = useState<string | null>(null);
+  const [dragDirection, setDragDirection] = useState<"up" | "down" | null>(null);
   const draggedCartOptionIdRef = useRef<string | null>(null);
 
   const [screenStartedAt, setScreenStartedAt] = useState(() => new Date());
@@ -149,7 +150,7 @@ export default function RankingScreen({
   const [preferenceChanged, setPreferenceChanged] = useState(false);
 
   const currentRank = selectedRanking.length + 1;
-  const isPucprReorderEnabled = location === "PUCPR";
+  const isReorderEnabled = location === "PUCPR" || location === "UFBA";
 
   const stepKeys: TranslationKey[] = [
     "ranking.step1",
@@ -435,7 +436,7 @@ export default function RankingScreen({
   ) {
     const currentId = draggedCartOptionIdRef.current;
 
-    if (!isPucprReorderEnabled || !currentId || currentId === targetId) return;
+    if (!isReorderEnabled || !currentId || currentId === targetId) return;
 
     setSelectedRanking((currentRanking) => {
       const fromIndex = currentRanking.findIndex((option) => option.id === currentId);
@@ -446,6 +447,7 @@ export default function RankingScreen({
       }
 
       const movedOption = currentRanking[fromIndex];
+      setDragDirection(toIndex > fromIndex ? "down" : "up");
 
       setClickLogs((currentLogs) => [
         ...currentLogs,
@@ -466,17 +468,18 @@ export default function RankingScreen({
     event: PointerEvent<HTMLLIElement>,
     optionId: string
   ) {
-    if (!isPucprReorderEnabled) return;
+    if (!isReorderEnabled) return;
     if ((event.target as HTMLElement).closest("button")) return;
 
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
     draggedCartOptionIdRef.current = optionId;
     setDraggedCartOptionId(optionId);
+    setDragDirection(null);
   }
 
   function handleCartPointerMove(event: PointerEvent<HTMLLIElement>) {
-    if (!isPucprReorderEnabled || !draggedCartOptionIdRef.current) return;
+    if (!isReorderEnabled || !draggedCartOptionIdRef.current) return;
 
     const target = document
       .elementFromPoint(event.clientX, event.clientY)
@@ -490,7 +493,7 @@ export default function RankingScreen({
   }
 
   function handleCartPointerEnd(event: PointerEvent<HTMLLIElement>) {
-    if (!isPucprReorderEnabled) return;
+    if (!isReorderEnabled) return;
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
@@ -498,6 +501,7 @@ export default function RankingScreen({
 
     draggedCartOptionIdRef.current = null;
     setDraggedCartOptionId(null);
+    setDragDirection(null);
   }
 
   function handleRankingCompleteClick(event?: MouseEvent<HTMLButtonElement>) {
@@ -516,11 +520,17 @@ export default function RankingScreen({
 
   return (
     <div className="ranking-area">
-      <header className="ranking-toolbar">
+      <header
+        className={
+          selectedRanking.length === options.length
+            ? "ranking-toolbar ranking-toolbar--complete"
+            : "ranking-toolbar"
+        }
+      >
         <div>
           <p>
             {t("common.session")} {sessionNumber}
-            {sessionSuffix ? ` · ${sessionSuffix}` : ""}
+            {sessionSuffix ? ` - ${sessionSuffix}` : ""}
           </p>
 
           <h2>
@@ -534,7 +544,11 @@ export default function RankingScreen({
         </div>
 
         {location !== "PUCPR" && (
-          <button type="button" onClick={handleClearSelections}>
+          <button
+            type="button"
+            className="clear-selections-button"
+            onClick={handleClearSelections}
+          >
             {t("ranking.clear")}
           </button>
         )}
@@ -606,7 +620,7 @@ export default function RankingScreen({
         >
           <div className="cart-header">
             <div>
-              <p>{t("ranking.cartTitle")}</p>
+              {t("ranking.cartTitle") && <p>{t("ranking.cartTitle")}</p>}
               <h3>{t("ranking.cartSubtitle")}</h3>
             </div>
 
@@ -622,26 +636,44 @@ export default function RankingScreen({
             </div>
           ) : (
             <>
-            {isPucprReorderEnabled && (
+            {isReorderEnabled && (
               <p className="cart-reorder-instruction">
                 {t("final.dragInstruction")}
               </p>
             )}
             <ol
               className={
-                isPucprReorderEnabled
+                isReorderEnabled
                   ? "cart-list cart-list--reorderable"
                   : "cart-list"
               }
             >
-              {selectedRanking.map((option, index) => (
-                <li
+              {selectedRanking.map((option, index) => {
+                const isDragging =
+                  isReorderEnabled && draggedCartOptionId === option.id;
+
+                return (
+                <motion.li
                   key={option.id}
+                  layout
+                  transition={{
+                    layout: {
+                      type: "spring",
+                      stiffness: 420,
+                      damping: 34,
+                      mass: 0.8,
+                    },
+                  }}
+                  animate={
+                    isDragging
+                      ? { scale: 1.025, y: -4 }
+                      : { scale: 1, y: 0 }
+                  }
                   data-cart-option-id={option.id}
                   className={
-                    isPucprReorderEnabled && draggedCartOptionId === option.id
+                    isDragging
                       ? "cart-item cart-item--draggable cart-item--dragging"
-                      : isPucprReorderEnabled
+                      : isReorderEnabled
                         ? "cart-item cart-item--draggable"
                         : "cart-item"
                   }
@@ -650,7 +682,17 @@ export default function RankingScreen({
                   onPointerUp={handleCartPointerEnd}
                   onPointerCancel={handleCartPointerEnd}
                 >
-                  <div className="cart-rank">#{index + 1}</div>
+                  <div className="cart-rank">
+                    <span>#{index + 1}</span>
+                    {isDragging && dragDirection && (
+                      <span
+                        className={`cart-rank-arrow cart-rank-arrow--${dragDirection}`}
+                        aria-hidden="true"
+                      >
+                        {dragDirection === "up" ? "▲" : "▼"}
+                      </span>
+                    )}
+                  </div>
 
                   <div className="cart-item-info">
                     <strong>{option.title}</strong>
@@ -669,10 +711,11 @@ export default function RankingScreen({
                     onClick={(event) => removeFromCart(option.id, event)}
                     aria-label={`${t("ranking.removeAria")} ${option.title}`}
                   >
-                    ×
+                    Ã—
                   </button>
-                </li>
-              ))}
+                </motion.li>
+                );
+              })}
             </ol>
             </>
           )}
@@ -718,3 +761,4 @@ export default function RankingScreen({
     </div>
   );
 }
+

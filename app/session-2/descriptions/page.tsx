@@ -281,6 +281,24 @@ export default function SessionTwoDescriptionsPage() {
     setParticipantLocation(localStorage.getItem("participantLocation") || "UNKNOWN");
   }, []);
 
+  useEffect(() => {
+    if (!zoomedSealId) return;
+
+    function handlePointerDown(event: PointerEvent) {
+      if ((event.target as HTMLElement).closest(".final-seal-zoom-btn")) {
+        return;
+      }
+
+      setZoomedSealId(null);
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [zoomedSealId]);
+
   const seals = participantLocation === "UFBA" ? SEALS_UFBA : participantLocation === "NMSU" ? SEALS_NMSU : SEALS_PUCPR;
 
   const randomizationSeed = useMemo(() => {
@@ -698,15 +716,15 @@ export default function SessionTwoDescriptionsPage() {
           <section className="session-two-card">
             <div className="session-two-heading">
               <div>
+                <p className="session-two-step-label">
+                  {t("common.session")} 2
+                </p>
                 <h2>{t("s2.readTitle")}</h2>
                 <p>
                   {t("s2.readDesc")}
                 </p>
               </div>
 
-              <div className="read-counter" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>
-                {readSealIds.length}/{seals.length} {t("s2.readCount")}
-              </div>
             </div>
 
             <div className="seal-description-grid">
@@ -742,13 +760,20 @@ export default function SessionTwoDescriptionsPage() {
             >
               {allSealsRead
                 ? t("s2.continueReady")
-                : t("s2.continueBlocked")}
+                : (
+                  <>
+                    <span>{t("s2.continueBlocked")}</span>
+                    <span className="button-progress-count">
+                      ({readSealIds.length}/{seals.length} {t("s2.readCount")})
+                    </span>
+                  </>
+                )}
             </button>
           </section>
         )}
 
         {step === "agreement" && (
-          <section className="complete-card">
+          <section className="complete-card seal-agreement-card">
             <div className="badge" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>{t("s2.confirmBadge")}</div>
             <h2>{t("s2.confirmTitle")}</h2>
             <p>
@@ -803,7 +828,7 @@ export default function SessionTwoDescriptionsPage() {
         )}
 
         {step === "final-confirmation" && (
-          <section className="complete-card">
+          <section className="complete-card final-confirmation-card">
             <div className="badge" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>{t("s2.finalBadge")}</div>
             <h2>{t("s2.finalTitle")}</h2>
             <p>
@@ -863,13 +888,13 @@ export default function SessionTwoDescriptionsPage() {
         )}
 
         {step === "demographics" && (
-          <section className="complete-card">
+          <section className="complete-card demographics-card">
             <DemographicsForm onSubmit={saveSessionTwo} locationColor={locationColors[participantLocation] ?? "#bb0b0b"} />
           </section>
         )}
 
         {step === "completed" && (
-          <section className="complete-card">
+          <section className="complete-card completed-step-card">
             <div className="badge" style={{ background: locationColors[participantLocation] ?? "#bb0b0b" }}>{t("common.completed")}</div>
             <h2>{t("s2.completedTitle")}</h2>
             <p>{t("common.clickContinue1")} <strong>{t("common.continue")}</strong> {t("common.clickContinue2")}</p>

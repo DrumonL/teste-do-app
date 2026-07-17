@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { RankingOption } from "@/components/RankingScreen";
 import { useLanguage } from "@/lib/i18n";
@@ -41,7 +41,27 @@ export default function ProductCard({
   onSealClick,
 }: ProductCardProps) {
   const [isZoomed, setIsZoomed] = useState(false);
+  const sealButtonRef = useRef<HTMLButtonElement | null>(null);
   const { t } = useLanguage();
+
+  useEffect(() => {
+    if (!isZoomed) return;
+
+    function handlePointerDown(event: PointerEvent) {
+      if (sealButtonRef.current?.contains(event.target as Node)) {
+        return;
+      }
+
+      setIsZoomed(false);
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [isZoomed]);
+
   return (
     <article className={`product-card${location ? ` product-card--${location.toLowerCase()}` : ""}`}>
       <div className="product-image-box meat-seal-display">
@@ -68,6 +88,7 @@ export default function ProductCard({
         {option.sealImageUrl && (
           <button
             type="button"
+            ref={sealButtonRef}
             className={sealZoom ? "seal-click-button seal-zoom-trigger" : "seal-click-button"}
             onClick={(event) => {
               event.stopPropagation();

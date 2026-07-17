@@ -521,6 +521,12 @@ input {
   font-weight: 800;
 }
 
+.session-two-step-label {
+  margin: 0 0 6px;
+  color: #2a1d14;
+  font-weight: 800;
+}
+
 .ranking-toolbar h2 {
   margin: 0;
   font-size: 24px;
@@ -835,6 +841,30 @@ input {
   font-weight: 900;
 }
 
+.final-thank-you-card {
+  text-align: center;
+}
+
+.final-thank-you-card h2 {
+  margin: 0;
+}
+
+.final-thank-you-card p {
+  margin: 12px auto 0;
+  font-size: 18px;
+}
+
+.final-thank-you-actions {
+  margin-top: 28px;
+}
+
+.final-thank-you-card .primary-link-button {
+  margin-top: 28px;
+  min-width: 180px;
+  padding: 18px 30px;
+  font-size: 18px;
+}
+
 
 .ranking-layout {
   display: grid;
@@ -864,7 +894,7 @@ input {
 
 .cart-header p {
   margin: 0 0 4px;
-  color: #7b4a24;
+  color: #000000;
   font-weight: 800;
   font-size: 14px;
 }
@@ -938,16 +968,27 @@ input {
   cursor: grab;
   touch-action: none;
   user-select: none;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  border: 1px solid transparent;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease;
 }
 
 .cart-item--dragging {
   z-index: 3;
   position: relative;
   cursor: grabbing;
-  transform: scale(1.035);
+  transform: translateY(-4px) scale(1.035);
   background: #ffffff;
-  box-shadow: 0 18px 36px rgba(42, 29, 20, 0.22);
+  border-color: #000000;
+  box-shadow: 0 20px 42px rgba(42, 29, 20, 0.28);
+}
+
+.cart-item--dragging .cart-rank {
+  background: #ead8c4;
+  color: #000000;
 }
 
 .location-pucpr .cart-list--reorderable .cart-item button {
@@ -960,10 +1001,53 @@ input {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 3px;
   border-radius: 14px;
-  background: #f3eadc;
-  color: #7b4a24;
+  background: #f2f5f7;
+  color: #000000;
   font-weight: 900;
+  transition:
+    background 0.22s ease,
+    color 0.22s ease,
+    transform 0.22s ease;
+}
+
+.cart-rank-arrow {
+  display: inline-block;
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 0.8;
+  opacity: 1;
+  transform: scaleX(1.22);
+  text-shadow: 0.55px 0 currentColor, -0.55px 0 currentColor;
+}
+
+.cart-rank-arrow--up {
+  color: #18803a;
+  animation: rank-arrow-up 0.55s ease-in-out infinite alternate;
+}
+
+.cart-rank-arrow--down {
+  color: #c62929;
+  animation: rank-arrow-down 0.55s ease-in-out infinite alternate;
+}
+
+@keyframes rank-arrow-up {
+  from {
+    transform: translateY(2px) scaleX(1.22);
+  }
+  to {
+    transform: translateY(-2px) scaleX(1.22);
+  }
+}
+
+@keyframes rank-arrow-down {
+  from {
+    transform: translateY(-2px) scaleX(1.22);
+  }
+  to {
+    transform: translateY(2px) scaleX(1.22);
+  }
 }
 
 .cart-item-info {
@@ -1066,6 +1150,11 @@ input {
   color: #7b4a24;
   cursor: not-allowed;
   box-shadow: none;
+}
+
+.button-progress-count {
+  display: block;
+  margin-top: 4px;
 }
 
 .meat-seal-display {
@@ -1359,18 +1448,26 @@ input {
 }
 
 .session-two-heading h2 {
-  margin: 0;
-  font-size: 40px;
   color: #2a1d14;
+  margin: 5px;
+  font-size: 40px;
 }
 
 .session-two-heading p {
   width: 823.76px;
   height: 63px;
-  margin: 8px 0 0 0;
+  margin: 5px;
   color: #6b5b4c;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.4;
+}
+
+.study-page .session-two-heading .session-two-step-label {
+  width: auto;
+  height: auto;
+  margin: 0 0 6px;
+  color: #2a1d14;
+  font-weight: 800;
 }
 
 .read-counter {
