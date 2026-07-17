@@ -873,7 +873,7 @@
 
   .location-pucpr .complete-card h2 {
     color: #2a1d14;
-    margin: 0;
+    margin: 4px;
     font-size: 22px;
   }
 
@@ -916,7 +916,7 @@
   .location-pucpr .complete-card h2,
   .location-pucpr .demographics-form .form-intro h2,
   .location-pucpr .final-thank-you-card h2 {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .location-pucpr .completed-step-card > p {
